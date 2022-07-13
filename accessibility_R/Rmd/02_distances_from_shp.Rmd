@@ -31,8 +31,12 @@ Having the centroids, a simple way to include the spatial data to analyze the ur
 
 ```{r processing distance-matrix}
 distance <- st_distance(centroids, centroids)
-
-write.csv(distance, '../data/distance_matrix.csv')
 ```
+```{r}
+# convert matrix to df to save de csv file
+df <- as.data.frame(distance)
+write_csv(df, '../data/distance_matrix.csv')
+```
+
 
 

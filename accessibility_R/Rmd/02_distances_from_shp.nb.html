@@ -1768,14 +1768,9 @@ now, I will focus on the <code>sf</code> package. Later we will test
 other possibilities.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShzZilcbmBgYCJ9 -->
-<pre class="r"><code>library(sf)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTGlua2luZyB0byBHRU9TIDMuOS4xLCBHREFMIDMuMi4xLCBQUk9KIDcuMi4xOyBzZl91c2VfczIoKSBpcyBUUlVFXG4ifQ== -->
-<pre><code>Linking to GEOS 3.9.1, GDAL 3.2.1, PROJ 7.2.1; sf_use_s2() is TRUE</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2hwIDwtIHJlYWRfc2YoJy4uL2RhdGEvWm9uYXNfMjAxN19yZWdpb24uc2hwJylcbmhlYWQoc2hwKVxuYGBgIn0= -->
-<pre class="r"><code>shp &lt;- read_sf(&#39;../data/Zonas_2017_region.shp&#39;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShzZilcbnNocCA8LSByZWFkX3NmKCcuLi9kYXRhL1pvbmFzXzIwMTdfcmVnaW9uLnNocCcpXG5oZWFkKHNocClcbmBgYCJ9 -->
+<pre class="r"><code>library(sf)
+shp &lt;- read_sf(&#39;../data/Zonas_2017_region.shp&#39;)
 head(shp)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiU2ltcGxlIGZlYXR1cmUgY29sbGVjdGlvbiB3aXRoIDYgZmVhdHVyZXMgYW5kIDcgZmllbGRzXG5HZW9tZXRyeSB0eXBlOiBNVUxUSVBPTFlHT05cbkRpbWVuc2lvbjogICAgIFhZWlxuQm91bmRpbmcgYm94OiAgeG1pbjogMzMxODIwLjUgeW1pbjogNzM5MzkyMiB4bWF4OiAzMzQxODAuNSB5bWF4OiA3Mzk2MzExXG56X3JhbmdlOiAgICAgICB6bWluOiAwIHptYXg6IDBcblByb2plY3RlZCBDUlM6IENvcnJlZ28gQWxlZ3JlIDE5NzAtNzIgLyBVVE0gem9uZSAyM1NcbiJ9 -->
@@ -1839,17 +1834,23 @@ distance</strong>. We can create the matrix by using the
 <code>st_distance</code> of the <code>sf</code> library.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlzdGFuY2UgPC0gc3RfZGlzdGFuY2UoY2VudHJvaWRzLCBjZW50cm9pZHMpXG5cbndyaXRlLmNzdihkaXN0YW5jZSwgJy4uL2RhdGEvZGlzdGFuY2VfbWF0cml4LmNzdicpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlzdGFuY2UgPC0gc3RfZGlzdGFuY2UoY2VudHJvaWRzLCBjZW50cm9pZHMpXG5cbndyaXRlX2NzdihkaXN0YW5jZSwgJy4uL2RhdGEvZGlzdGFuY2VfbWF0cml4LmNzdicpXG5gYGAifQ== -->
 <pre class="r"><code>distance &lt;- st_distance(centroids, centroids)
 
-write.csv(distance, &#39;../data/distance_matrix.csv&#39;)</code></pre>
+write_csv(distance, &#39;../data/distance_matrix.csv&#39;)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gd3JpdGVfZGVsaW0oeCwgZmlsZSwgZGVsaW0gPSBcIixcIiwgbmEgPSBuYSwgYXBwZW5kID0gYXBwZW5kLCBjb2xfbmFtZXMgPSBjb2xfbmFtZXMsICA6IFxuICBpcy5kYXRhLmZyYW1lKHgpIGlzIG5vdCBUUlVFXG4ifQ== -->
+<pre><code>Error in write_delim(x, file, delim = &quot;,&quot;, na = na, append = append, col_names = col_names,  : 
+  is.data.frame(x) is not TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlByZXBhcmluZyB0aGUgc3BhdGlhbCBkYXRhIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KVGhlIGFjY2Vzc2liaWxpdHkgYW5hbHlzaXMgYWxzbyBkZXBlbmRzIG9uIHRoZSBzcGF0aWFsIGRhdGEuIEluIHRoaXMgcG9zdCwgSSB3aWxsIGxvYWQgdGhlIGBzaGFwZWZpbGVgIGFuZCBwcm9jZXNzIHRoZSBldWNsaWRlYW4gZGlzdGFuY2UgYW1vbmcgdGhlIGNlbnRyb2lkcyAocG9pbnQgYXQgdGhlIGdlb21ldHJpYyBjZW50ZXIgb2YgdGhlIGdlb21ldHJ5KS4gVGhlcmUgYXJlIHNldmVyYWwgcGFja2FnZXMgYW5kIHdheXMgdG8gZG8gdGhpcyBwcm9jZXNzLiBGb3Igbm93LCBJIHdpbGwgZm9jdXMgb24gdGhlIGBzZmAgcGFja2FnZS4gTGF0ZXIgd2Ugd2lsbCB0ZXN0IG90aGVyIHBvc3NpYmlsaXRpZXMuDQoNCmBgYHtyIGxvYWRpbmcgbGlicmFyeSBhbmQgc2hwfQ0KbGlicmFyeShzZikNCnNocCA8LSByZWFkX3NmKCcuLi9kYXRhL1pvbmFzXzIwMTdfcmVnaW9uLnNocCcpDQpoZWFkKHNocCkNCmBgYA0KIyMgR2V0dGluZyB0aGUgY2VudHJvaWRzDQoNCkZpcnN0LCBsZXQncyB0YWtlIGEgcXVpY2sgbG9vayAod2l0aG91dCBlbWJlbGlzaG1lbnRzKSBhdCB0aGUgYHNoYXBlZmlsZWAuDQoNCmBgYHtyfQ0KcGxvdChzaHBbLCdnZW9tZXRyeSddKQ0KYGBgDQpJbiB0aGUgYHNmYCAoc2ltcGxlIGZlYXR1cmVzKSBwYWNrYWdlLCB3ZSBjYW4gYXBwbHkgdGhlIGZ1bmN0aW9uIGBzdF9jZW50cm9pZGAgdG8gZ2V0IHRoZSBjZW50cm9pZHMgb2YgdGhlIGdlb21ldHJ5Lg0KDQpgYGB7ciBjZW50cm9pZHN9DQpjZW50cm9pZHMgPC0gc3RfY2VudHJvaWQoc2hwKQ0KcGxvdChjZW50cm9pZHNbLCdnZW9tZXRyeSddKQ0KYGBgDQpTZWUgdGhhdCBpbnN0ZWFkIG9mIGFyZWFzL3JlZ2lvbnMsIHdlIGhhdmUgcG9pbnRzIG5vdy4NCg0KIyMgUHJvY2Vzc2luZyB0aGUgZGlzdGFuY2VzDQoNCkhhdmluZyB0aGUgY2VudHJvaWRzLCBhIHNpbXBsZSB3YXkgdG8gaW5jbHVkZSB0aGUgc3BhdGlhbCBkYXRhIHRvIGFuYWx5emUgdGhlIHVyYmFuIGFjY2Vzc2liaWxpdHkgaXMgdGhyb3VnaCB0aGUgKipldWNsaWRlYW4gZGlzdGFuY2UqKi4gV2UgY2FuIGNyZWF0ZSB0aGUgbWF0cml4IGJ5IHVzaW5nIHRoZSBgc3RfZGlzdGFuY2VgIG9mIHRoZSBgc2ZgIGxpYnJhcnkuDQoNCmBgYHtyIHByb2Nlc3NpbmcgZGlzdGFuY2UtbWF0cml4fQ0KZGlzdGFuY2UgPC0gc3RfZGlzdGFuY2UoY2VudHJvaWRzLCBjZW50cm9pZHMpDQoNCndyaXRlLmNzdihkaXN0YW5jZSwgJy4uL2RhdGEvZGlzdGFuY2VfbWF0cml4LmNzdicpDQpgYGANCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlByZXBhcmluZyB0aGUgc3BhdGlhbCBkYXRhIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KVGhlIGFjY2Vzc2liaWxpdHkgYW5hbHlzaXMgYWxzbyBkZXBlbmRzIG9uIHRoZSBzcGF0aWFsIGRhdGEuIEluIHRoaXMgcG9zdCwgSSB3aWxsIGxvYWQgdGhlIGBzaGFwZWZpbGVgIGFuZCBwcm9jZXNzIHRoZSBldWNsaWRlYW4gZGlzdGFuY2UgYW1vbmcgdGhlIGNlbnRyb2lkcyAocG9pbnQgYXQgdGhlIGdlb21ldHJpYyBjZW50ZXIgb2YgdGhlIGdlb21ldHJ5KS4gVGhlcmUgYXJlIHNldmVyYWwgcGFja2FnZXMgYW5kIHdheXMgdG8gZG8gdGhpcyBwcm9jZXNzLiBGb3Igbm93LCBJIHdpbGwgZm9jdXMgb24gdGhlIGBzZmAgcGFja2FnZS4gTGF0ZXIgd2Ugd2lsbCB0ZXN0IG90aGVyIHBvc3NpYmlsaXRpZXMuDQoNCmBgYHtyIGxvYWRpbmcgbGlicmFyeSBhbmQgc2hwfQ0KbGlicmFyeShzZikNCnNocCA8LSByZWFkX3NmKCcuLi9kYXRhL1pvbmFzXzIwMTdfcmVnaW9uLnNocCcpDQpoZWFkKHNocCkNCmBgYA0KIyMgR2V0dGluZyB0aGUgY2VudHJvaWRzDQoNCkZpcnN0LCBsZXQncyB0YWtlIGEgcXVpY2sgbG9vayAod2l0aG91dCBlbWJlbGlzaG1lbnRzKSBhdCB0aGUgYHNoYXBlZmlsZWAuDQoNCmBgYHtyfQ0KcGxvdChzaHBbLCdnZW9tZXRyeSddKQ0KYGBgDQpJbiB0aGUgYHNmYCAoc2ltcGxlIGZlYXR1cmVzKSBwYWNrYWdlLCB3ZSBjYW4gYXBwbHkgdGhlIGZ1bmN0aW9uIGBzdF9jZW50cm9pZGAgdG8gZ2V0IHRoZSBjZW50cm9pZHMgb2YgdGhlIGdlb21ldHJ5Lg0KDQpgYGB7ciBjZW50cm9pZHN9DQpjZW50cm9pZHMgPC0gc3RfY2VudHJvaWQoc2hwKQ0KcGxvdChjZW50cm9pZHNbLCdnZW9tZXRyeSddKQ0KYGBgDQpTZWUgdGhhdCBpbnN0ZWFkIG9mIGFyZWFzL3JlZ2lvbnMsIHdlIGhhdmUgcG9pbnRzIG5vdy4NCg0KIyMgUHJvY2Vzc2luZyB0aGUgZGlzdGFuY2VzDQoNCkhhdmluZyB0aGUgY2VudHJvaWRzLCBhIHNpbXBsZSB3YXkgdG8gaW5jbHVkZSB0aGUgc3BhdGlhbCBkYXRhIHRvIGFuYWx5emUgdGhlIHVyYmFuIGFjY2Vzc2liaWxpdHkgaXMgdGhyb3VnaCB0aGUgKipldWNsaWRlYW4gZGlzdGFuY2UqKi4gV2UgY2FuIGNyZWF0ZSB0aGUgbWF0cml4IGJ5IHVzaW5nIHRoZSBgc3RfZGlzdGFuY2VgIG9mIHRoZSBgc2ZgIGxpYnJhcnkuDQoNCmBgYHtyIHByb2Nlc3NpbmcgZGlzdGFuY2UtbWF0cml4fQ0KZGlzdGFuY2UgPC0gc3RfZGlzdGFuY2UoY2VudHJvaWRzLCBjZW50cm9pZHMpDQpgYGANCmBgYHtyfQ0KIyBjb252ZXJ0IG1hdHJpeCB0byBkZiB0byBzYXZlIGRlIGNzdiBmaWxlDQpkZiA8LSBhcy5kYXRhLmZyYW1lKGRpc3RhbmNlKQ0Kd3JpdGVfY3N2KGRmLCAnLi4vZGF0YS9kaXN0YW5jZV9tYXRyaXguY3N2JykNCmBgYA0KDQoNCg0K</div>
 
 
 
