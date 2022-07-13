@@ -32,9 +32,11 @@ threshold <- 10000
 
 The threshold can be a random number, and I chose 10km for this analysis.
 
-## Creating the functions
+## Base - matrix
 
-Base - matrix
+In a straight way, we can process the cumulative accessibility by using some simple matrix operations. To recap, the euclidean distances were processed by getting the geometric centers of each zone (`st_centroids` of `sf`) and the distances among these points (`st_distance`). The last function produced a matrix with all the distances among the origin-destination pairs. Therefore, the procedure was simple.
+
+After evaluating the distances regarding the threshold and getting a `boolean matrix`, the next step was to associate the jobs (opportunities to be analyzed) to the destinations ($j$). The multiplication of the `boolean matrix` and the `array` (read as a matrix of one line and 517 columns) provides the cumulative accessibility for each origin ($i$) zone.
 
 ```{r matrix process}
 acc_matrix <- function(distances, jobs, threshold){
@@ -44,23 +46,34 @@ acc_matrix <- function(distances, jobs, threshold){
   
   # filtering 
   dist_filt <- distances_mt <= threshold   # provides a boolean matrix
-  df <- data.frame(origin = 1:517,
+  df <- data.frame(origin = 1:nrow(distances),
                    acc = dist_filt %*% jobs_mt)
   return(df)
 }
 ```
 
-Tidyverse
+As mentioned before, the calculated distance data is in a matrix format. So the other two methods will already begin in a disadvantage due to the structure conversion. For comparison purposses, two functions for each method will be created, one to convert the `matrix` to a `data.frame` or `data.table` with the selected library and the other to process the accessibility.
+
+## Tidyverse - dataframe
+
+
 
 ```{r tidyverse process}
-acc_tidy <- function(distances, jobs, threshold){
+# matrix convert
+distance_df <- function(distances){
   df <- distances |>
-    mutate(origin = 1:517) |>
+    mutate(origin = 1:nrow(distances)) |>
     pivot_longer(cols = -origin,
                  names_to = 'destination',
                  values_to = 'distance') |>
-    filter(distance <= threshold) |>
-    mutate(destination = as.numeric(str_remove(destination, 'V'))) |>
+    mutate(destination = as.numeric(str_remove(destination, 'V')))
+  return(df)
+}
+
+# process accessibility
+acc_tidy <- function(distances, jobs, threshold){
+  df <- distances |>
+    filter(distance <= threshold) |> 
     left_join(jobs, by = c('destination' = 'Zona')) |>
     group_by(origin) |>
     summarise(acc = sum(Empregos))
@@ -68,10 +81,54 @@ acc_tidy <- function(distances, jobs, threshold){
 }
 ```
 
-Data.table
+## Data.table
 
 ```{r data.table process}
+# matrix convert
+distance_dt <- function(distances){
+  distances['origin'] <- 1:nrow(distances)
+  dt <- melt(data = as.data.table(distances),
+             id.vars = 'origin',
+             variable.name = 'destination',
+             value.name = 'distance')[, 
+     `:=` (destination = as.numeric(str_remove(destination, 'V')))]
+  return(dt)
+}
 
+acc_dt <- function(distances, jobs, threshold){
+  # converting dfs to dt
+  jobs_dt <- as.data.table(jobs, key = 'Zona')
+  
+  # filtering and updating destination
+  dt <- distances[distance <= threshold, ][ # update
+    jobs_dt, on = .(destination = Zona)][ # join
+      , 
+      .(acc = sum(Empregos)), # process
+      by = origin] # group_by
+  return(dt)
+}
 
+```
+
+## Comparing the functions
+
+```{r}
+library(rbenchmark)
+
+df_distances <- distance_df(distances)
+dt_distances <- distance_dt(distances)
+
+benchmark(base_matrix = acc_matrix(distances, jobs, threshold),
+          df_whole = {
+            df_distances <- distance_df(distances)
+            acc_tidy(df_distances, jobs, threshold)
+          },
+          df_proc = acc_tidy(df_distances, jobs, threshold),
+          dt_whole = {
+            dt_distances <- distance_dt(distances)
+            acc_dt(dt_distances, jobs, threshold)
+          },
+          dt_proc = acc_dt(dt_distances, jobs, threshold)
+          )
 ```
 
