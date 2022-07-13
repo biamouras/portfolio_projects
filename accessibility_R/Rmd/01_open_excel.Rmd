@@ -18,14 +18,14 @@ There are several packages in R to import excel files. I am used to use the `rea
 ```{r load libraries}
 library(readxl)
 
-xls <- read_excel('data/Tab01_OD2017.xlsx')
+xls <- read_excel('../data/Tab01_OD2017.xlsx')
 
 head(xls)
 ```
 You can see from the first few rows of the imported file that it has at least five rows without data. So let's read the file again without them.
 
 ```{r skipping rows}
-xls <- read_excel('data/Tab01_OD2017.xlsx', skip = 5)
+xls <- read_excel('../data/Tab01_OD2017.xlsx', skip = 5)
 head(xls)
 ```
 
@@ -90,7 +90,7 @@ str(df)
 
 Perfect! Now I have the organized data to continue the analysis.
 ```{r}
-write.csv(df, 'data/zones_data.csv')
+write.csv(df, '../data/zones_data.csv')
 ```
 
 
