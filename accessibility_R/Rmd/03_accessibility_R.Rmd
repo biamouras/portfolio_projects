@@ -1,0 +1,13 @@
+---
+title: "Accessibility in R - testing efficient tools"
+output: html_notebook
+---
+
+The right to the city inequalities analyses can benefit from metrics such as urban accessibility. In my background, I have already used this indicator to assess the location of developments, considering their different patterns and target audience. Most of my analyses also looked at public policies that could increase the vulnerable population's access to opportunities sprawled in the city.
+
+Urban accessibility can be defined as the number of opportunities reachable from a specific location. Ii can be calculated in several ways, but the most known is the cumulative accessibility and gravitational accessibility. **Cumulative accessibility** sums up the number of opportunities reachable from a certain point within a **threshold of travel time or distance**. Therefore some opportunities can not be considered in the calculus of this indicator. Or the opportunity is within the threshold, or it is not.
+
+Meanwhile, the **gravitational accessibility** does not depend on a threshold and uses a decay function. This function weights the opportunities regarding their proximity to the point of interest. The closer the opportunity, the higher its weight in the sum of the opportunity to calculate the indicator.
+
+Most of the times I processed the cumulative accessibility, I used the `tidyverse` package, mostly `dplyr` and `magrittr`. However, I know it is not the most efficient approach. Therefore, I plan to develop some posts to showcase my learning process throughout this project. But in the end, I hope we will have a comparison among `base`, by using matrices, `tidyverse`, and `data.table`.
+
