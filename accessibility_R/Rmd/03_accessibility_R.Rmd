@@ -5,9 +5,73 @@ output: html_notebook
 
 The right to the city inequalities analyses can benefit from metrics such as urban accessibility. In my background, I have already used this indicator to assess the location of developments, considering their different patterns and target audience. Most of my analyses also looked at public policies that could increase the vulnerable population's access to opportunities sprawled in the city.
 
-Urban accessibility can be defined as the number of opportunities reachable from a specific location. Ii can be calculated in several ways, but the most known is the cumulative accessibility and gravitational accessibility. **Cumulative accessibility** sums up the number of opportunities reachable from a certain point within a **threshold of travel time or distance**. Therefore some opportunities can not be considered in the calculus of this indicator. Or the opportunity is within the threshold, or it is not.
+Urban accessibility ($A_i$) can be defined as the number of opportunities ($W_j$) reachable from a specific location ($i$) given an spatial dependent function ($f(c_{ij})$). It can be calculated in several ways, and the most known are the cumulative and gravitational accessibility. The methods have a similar formulation (below), and the difference is on how the spatial data is considered.
 
+$A_i = \sum_j{W_i*f(c_{ij})}$
+
+**Cumulative accessibility** sums up the number of opportunities reachable from a certain point within a **threshold of travel time or distance**. Therefore all the opportunities more distant (in time or space) from the point $i$ are not considered in the indicator. 
 Meanwhile, the **gravitational accessibility** does not depend on a threshold and uses a decay function. This function weights the opportunities regarding their proximity to the point of interest. The closer the opportunity, the higher its weight in the sum of the opportunity to calculate the indicator.
 
-Most of the times I processed the cumulative accessibility, I used the `tidyverse` package, mostly `dplyr` and `magrittr`. However, I know it is not the most efficient approach. Therefore, I plan to develop some posts to showcase my learning process throughout this project. But in the end, I hope we will have a comparison among `base`, by using matrices, `tidyverse`, and `data.table`.
+Most of the times I processed the **cumulative accessibility**, I used the `tidyverse` package, mostly `dplyr` and `magrittr`. However, I know it is not the most efficient approach. Therefore, I plan to develop some posts to showcase my learning process throughout this project. But in the end, I hope we will have a comparison among `base`, by using matrices, `tidyverse`, and `data.table`.
+
+For this process, we can then consider two steps: 
+
+1. Filtering the pairs with distance bigger than the threshold
+2. Summing up the opportunities for each point to get the accessibility
+
+```{r load files, echo = F}
+library(tidyverse)
+library(data.table)
+
+zones_data <- read_csv('../data/zones_data.csv')
+jobs <- zones_data[,c('Zona', 'Empregos')]
+distances <- read_csv('../data/distance_matrix.csv')
+
+threshold <- 10000
+```
+
+The threshold can be a random number, and I chose 10km for this analysis.
+
+## Creating the functions
+
+Base - matrix
+
+```{r matrix process}
+acc_matrix <- function(distances, jobs, threshold){
+  # converting the dfs to matrixes
+  jobs_mt <- jobs$Empregos
+  distances_mt <- as.matrix(distances)
+  
+  # filtering 
+  dist_filt <- distances_mt <= threshold   # provides a boolean matrix
+  df <- data.frame(origin = 1:517,
+                   acc = dist_filt %*% jobs_mt)
+  return(df)
+}
+```
+
+Tidyverse
+
+```{r tidyverse process}
+acc_tidy <- function(distances, jobs, threshold){
+  df <- distances |>
+    mutate(origin = 1:517) |>
+    pivot_longer(cols = -origin,
+                 names_to = 'destination',
+                 values_to = 'distance') |>
+    filter(distance <= threshold) |>
+    mutate(destination = as.numeric(str_remove(destination, 'V'))) |>
+    left_join(jobs, by = c('destination' = 'Zona')) |>
+    group_by(origin) |>
+    summarise(acc = sum(Empregos))
+  return(df)
+}
+```
+
+Data.table
+
+```{r data.table process}
+
+
+```
 
