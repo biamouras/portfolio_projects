@@ -1,0 +1,38 @@
+---
+title: "Preparing the spatial data"
+output: html_notebook
+---
+
+The accessibility analysis also depends on the spatial data. In this post, I will load the `shapefile` and process the euclidean distance among the centroids (point at the geometric center of the geometry). There are several packages and ways to do this process. For now, I will focus on the `sf` package. Later we will test other possibilities.
+
+```{r loading library and shp}
+library(sf)
+shp <- read_sf('../data/Zonas_2017_region.shp')
+head(shp)
+```
+## Getting the centroids
+
+First, let's take a quick look (without embelishments) at the `shapefile`.
+
+```{r}
+plot(shp[,'geometry'])
+```
+In the `sf` (simple features) package, we can apply the function `st_centroid` to get the centroids of the geometry.
+
+```{r centroids}
+centroids <- st_centroid(shp)
+plot(centroids[,'geometry'])
+```
+See that instead of areas/regions, we have points now.
+
+## Processing the distances
+
+Having the centroids, a simple way to include the spatial data to analyze the urban accessibility is through the **euclidean distance**. We can create the matrix by using the `st_distance` of the `sf` library.
+
+```{r processing distance-matrix}
+distance <- st_distance(centroids, centroids)
+
+write.csv(distance, '../data/distance_matrix.csv')
+```
+
+
