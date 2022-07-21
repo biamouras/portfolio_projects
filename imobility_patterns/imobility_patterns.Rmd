@@ -1,0 +1,122 @@
+---
+title: "(I)Mobility patterns at São Paulo"
+output: html_notebook
+---
+
+In transport planning and policies, understanding the travel patterns of the population are essencial to identify the target public and possibile solutions. For over 50 years of the Origin and Destination Survey at São Paulo one third of the population do not travel. This Exploratory Data Analysis aims to identify their profile considering: sex, age, main activity and other variables.
+
+<!-- Talvez incluir aqui a possibilidade de fazer uma análise de clusterização, posteriormente - que poderia facilitar essa análise que me proponho a fazer -->
+
+```{r, echo=F}
+library(tidyverse)
+library(data.table)
+
+df <- foreign::read.dbf('data/OD_2017.dbf')
+colnames(df) <- tolower(colnames(df))
+
+# there are multiple ids (id_fam, id_dom, id_pess), but my focus will be on people,
+# that's why I'll work with id_pess
+dt <- as.data.table(df, key = 'id_pess') 
+```
+
+## Análise geral
+
+```{r process data for general analysis}
+# reason for travelling aliases
+# work includes work at industries, commerce and services
+# errands includes goind to doctor, shopping and dealing with personal issues
+
+aux <- dt[1:1000
+][,
+  muni := if_else(str_detect(paste(modo1, modo2, modo3, modo4), ' 4'),
+                  'uses muni',
+                  'does not use muni')
+  ][muni == 'uses muni'][, 
+    muni:=NULL
+    ][,
+      `:=` (motivo = paste(unique(motivo_d), collapse = ', '), 
+            pagamto = paste(unique(pag_viag), collapse = ', ')),
+      by = id_pess
+      ][,
+        `:=` (motivo2 = str_replace_all(motivo, 
+                                     c('5|6|10' = 'Errands',
+                                       '11' = 'Meal',
+                                       '1|2|3' = 'Work',
+                                       '4' = 'School',
+                                       '7' = 'Leisure',
+                                       '8' = 'Home',
+                                       '9' = 'Look for job')),
+            pagamto2 = str_replace_all(pagamto,
+                                      c('1' = 'Self/Family',
+                                        '2' = 'Employer',
+                                        '3' = 'Free',
+                                        '4' = 'Other',
+                                        '5' = 'DNA'
+                                        )))
+        ][,
+          .(id_pess, motivo, motivo2, pagamto, pagamto2)
+        ]
+
+
+dt_people <- dt[f_pess == 1, 1:82]
+# frequency of people per number of trips
+
+aux <- dt_people[, cut_viag := cut(tot_viag,
+                                   breaks = c(-1, 0, 2, 30),
+                                   labels = c('no trip', 
+                                              'up to 2 trips', 
+                                              'more than 2 trips'))
+][
+  , .N, by = 'cut_viag'
+][
+  , perc := N / sum(N)
+] 
+```
+
+```{r chart of general analysis}
+theme_chart <-   theme_bw() +
+  theme(panel.border = element_blank(),
+        axis.line = element_line(color = 'grey10'))
+
+main_color <- '#26172AFF'
+
+# falta incluir o expand
+aux |>
+  ggplot(aes(x = cut_viag, y = N)) +
+  geom_bar(stat = 'identity',
+           fill = main_color) +
+  geom_text(aes(label = scales::percent(perc)),
+            color = main_color,
+            nudge_y = 2000) +
+  scale_fill_viridis_d(option = 'mako') +
+  scale_y_continuous('Number of people') +
+  labs(x = '') + 
+  theme_chart
+```
+```{r prepare data}
+
+
+
+```
+
+
+The public transport at São Paulo has different services and providing agencies. From the people that uses the public transport, `r ` uses the municipal bus system. As our focus is to identify the potencial demand for the municipal bus system, the following analysis will consider the people that use this mode.
+
+
+```{r}
+unique(dt_tp)
+```
+
+
+## activity
+```{r}
+
+```
+
+
+
+## Technical information
+
+* Data used: []()
+* Programming language and packages: R. tidyverse, foreign (import dbf)
+* Script: []()
