@@ -17,28 +17,32 @@ colnames(df) <- tolower(colnames(df))
 # there are multiple ids (id_fam, id_dom, id_pess), but my focus will be on people,
 # that's why I'll work with id_pess
 dt <- as.data.table(df, key = 'id_pess') 
+rm(df)
+gc()
 ```
 
 ## Análise geral
 
 ```{r process data for general analysis}
-# reason for travelling aliases
-# work includes work at industries, commerce and services
-# errands includes goind to doctor, shopping and dealing with personal issues
 
-aux <- dt[1:1000
-][,
+# dt_muni 
+## reason for travelling aliases
+### work includes work at industries, commerce and services
+### errands includes going to doctor, shopping and dealing with personal issues
+
+dt_muni <- dt[,
   muni := if_else(str_detect(paste(modo1, modo2, modo3, modo4), ' 4'),
                   'uses muni',
                   'does not use muni')
-  ][muni == 'uses muni'][, 
+  ][muni == 'uses muni'][,  # filters the people that uses the bus system
     muni:=NULL
-    ][,
-      `:=` (motivo = paste(unique(motivo_d), collapse = ', '), 
-            pagamto = paste(unique(pag_viag), collapse = ', ')),
+    ][, # groups the same id_pess the multiple/unique reasons for travelling and who payed
+      .('motivo' = paste(unique(motivo_d), collapse = ', '), 
+            'pagamto' = paste(unique(pag_viag), collapse = ', ')),
       by = id_pess
-      ][,
-        `:=` (motivo2 = str_replace_all(motivo, 
+      ][, # substitutes with the aliases
+        .(id_pess,
+          motivo = str_replace_all(motivo, 
                                      c('5|6|10' = 'Errands',
                                        '11' = 'Meal',
                                        '1|2|3' = 'Work',
@@ -46,21 +50,25 @@ aux <- dt[1:1000
                                        '7' = 'Leisure',
                                        '8' = 'Home',
                                        '9' = 'Look for job')),
-            pagamto2 = str_replace_all(pagamto,
+            pagamto = str_replace_all(pagamto,
                                       c('1' = 'Self/Family',
                                         '2' = 'Employer',
                                         '3' = 'Free',
                                         '4' = 'Other',
                                         '5' = 'DNA'
                                         )))
-        ][,
-          .(id_pess, motivo, motivo2, pagamto, pagamto2)
         ]
 
-
 dt_people <- dt[f_pess == 1, 1:82]
-# frequency of people per number of trips
 
+dt_people <- merge(dt_people, dt_muni, 
+                   by = c('id_pess'),
+                   all.x = T)
+
+rm(dt_muni)
+gc()
+
+# frequency of people per number of trips
 aux <- dt_people[, cut_viag := cut(tot_viag,
                                    breaks = c(-1, 0, 2, 30),
                                    labels = c('no trip', 
@@ -93,18 +101,11 @@ aux |>
   labs(x = '') + 
   theme_chart
 ```
-```{r prepare data}
-
-
-
-```
-
-
-The public transport at São Paulo has different services and providing agencies. From the people that uses the public transport, `r ` uses the municipal bus system. As our focus is to identify the potencial demand for the municipal bus system, the following analysis will consider the people that use this mode.
+The public transport at São Paulo has different services and providing agencies. As our focus is to identify the potencial demand for the municipal bus system, the following analysis will consider the people that use this mode.
 
 
 ```{r}
-unique(dt_tp)
+
 ```
 
 
